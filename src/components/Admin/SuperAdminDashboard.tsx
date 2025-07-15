@@ -25,6 +25,7 @@ import { MetricCard } from './MetricCard';
 import { DashboardChart } from './DashboardChart';
 import { SystemAlerts } from './SystemAlerts';
 import { SystemMonitoring } from './SystemMonitoring';
+import { APIKeysDashboard } from './APIKeysDashboard';
 import { TopEntities } from './TopEntities';
 import { DashboardMetrics, ChartData } from '../../services/dashboardService';
 import { dashboardService } from '../../services/dashboardService';
@@ -226,6 +227,12 @@ const OverviewTab: React.FC<{
 
           {/* System Monitoring */}
           <SystemMonitoring />
+        </div>
+
+        {/* API Keys Dashboard */}
+        <div className="lg:col-span-3">
+          <h4 className="text-lg font-semibold text-gray-900 mb-4">Vue d'ensemble des clés API</h4>
+          <APIKeysDashboard />
         </div>
 
         {/* Sidebar */}
