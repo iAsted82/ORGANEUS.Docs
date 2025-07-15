@@ -6,6 +6,9 @@ import { Sidebar } from './components/Layout/Sidebar';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { TemplateLibrary } from './components/Templates/TemplateLibrary';
 import { DocumentList } from './components/Documents/DocumentList';
+import { FavoriteDocuments } from './components/Documents/FavoriteDocuments';
+import { ArchivedDocuments } from './components/Documents/ArchivedDocuments';
+import { RecentDocuments } from './components/Documents/RecentDocuments';
 import { DocumentEditor } from './components/Editor/DocumentEditor';
 import { AdminPanel } from './components/Admin/AdminPanel';
 
@@ -25,10 +28,13 @@ const AppContent: React.FC = () => {
       case 'templates':
         return <TemplateLibrary />;
       case 'documents':
-      case 'recent':
-      case 'favorites':
-      case 'archived':
         return <DocumentList />;
+      case 'recent':
+        return <RecentDocuments />;
+      case 'favorites':
+        return <FavoriteDocuments />;
+      case 'archived':
+        return <ArchivedDocuments />;
       case 'create':
         return <DocumentEditor />;
       case 'admin':

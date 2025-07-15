@@ -1,98 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Grid, List } from 'lucide-react';
 import { Template } from '../../types';
 import { TemplateCard } from './TemplateCard';
+import { documentService } from '../../services/documentService';
 
 export const TemplateLibrary: React.FC = () => {
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  const templates: Template[] = [
-    {
-      id: '1',
-      name: 'Contrat de prestation',
-      type: 'contract',
-      description: 'Contrat standard pour prestations de services avec clauses personnalisables',
-      content: { sections: [], styling: { font: 'Arial', fontSize: '12px', colors: { primary: '#000', secondary: '#666', text: '#333' }, spacing: { margin: '20px', padding: '15px' } } },
-      preview: '/api/templates/1/preview',
-      category: 'Juridique',
-      isCustom: false
-    },
-    {
-      id: '2',
-      name: 'Facture commerciale',
-      type: 'invoice',
-      description: 'Template de facture avec calculs automatiques et mentions légales',
-      content: { sections: [], styling: { font: 'Arial', fontSize: '12px', colors: { primary: '#000', secondary: '#666', text: '#333' }, spacing: { margin: '20px', padding: '15px' } } },
-      preview: '/api/templates/2/preview',
-      category: 'Comptabilité',
-      isCustom: false
-    },
-    {
-      id: '3',
-      name: 'Lettre de motivation',
-      type: 'letter',
-      description: 'Modèle de lettre de motivation personnalisable et professionnel',
-      content: { sections: [], styling: { font: 'Arial', fontSize: '12px', colors: { primary: '#000', secondary: '#666', text: '#333' }, spacing: { margin: '20px', padding: '15px' } } },
-      preview: '/api/templates/3/preview',
-      category: 'RH',
-      isCustom: false
-    },
-    {
-      id: '4',
-      name: 'Rapport d\'activité',
-      type: 'report',
-      description: 'Template de rapport mensuel avec graphiques et analyses',
-      content: { sections: [], styling: { font: 'Arial', fontSize: '12px', colors: { primary: '#000', secondary: '#666', text: '#333' }, spacing: { margin: '20px', padding: '15px' } } },
-      preview: '/api/templates/4/preview',
-      category: 'Reporting',
-      isCustom: false
-    },
-    {
-      id: '5',
-      name: 'Conditions générales',
-      type: 'legal',
-      description: 'CGV complètes pour e-commerce avec clauses RGPD',
-      content: { sections: [], styling: { font: 'Arial', fontSize: '12px', colors: { primary: '#000', secondary: '#666', text: '#333' }, spacing: { margin: '20px', padding: '15px' } } },
-      preview: '/api/templates/5/preview',
-      category: 'Juridique',
-      isCustom: false
-    },
-    {
-      id: '6',
-      name: 'Offre d\'emploi',
-      type: 'hr',
-      description: 'Template d\'offre d\'emploi avec description de poste détaillée',
-      content: { sections: [], styling: { font: 'Arial', fontSize: '12px', colors: { primary: '#000', secondary: '#666', text: '#333' }, spacing: { margin: '20px', padding: '15px' } } },
-      preview: '/api/templates/6/preview',
-      category: 'RH',
-      isCustom: false
-    }
-  ];
-
   const categories = ['all', 'Juridique', 'Comptabilité', 'RH', 'Reporting', 'Marketing'];
+
+  useEffect(() => {
+    loadTemplates();
+  }, [selectedCategory]);
+
+  const loadTemplates = async () => {
+    try {
+      setLoading(true);
+      const templateList = await documentService.getTemplates(selectedCategory);
+      setTemplates(templateList);
+    } catch (error) {
+      console.error('Erreur lors du chargement des templates:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateTemplate = () => {
+    console.log('Créer un nouveau template');
+  };
+
+  const handleSelectTemplate = async (template: Template) => {
+    try {
+      const title = `${template.name} - ${new Date().toLocaleDateString()}`;
+      await documentService.createDocumentFromTemplate(template.id, title);
+      console.log('Document créé à partir du template:', template.name);
+    } catch (error) {
+      console.error('Erreur lors de la création du document:', error);
+    }
+  };
+
+  const handlePreviewTemplate = (template: Template) => {
+    console.log('Aperçu du template:', template.name);
+  };
 
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Bibliothèque de templates</h2>
           <p className="text-gray-600">Choisissez un modèle pour commencer rapidement</p>
         </div>
-        <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2 shadow-lg">
+        <button 
+          onClick={handleCreateTemplate}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2 shadow-lg"
+        >
           <Plus className="h-5 w-5" />
           <span>Créer un template</span>
         </button>
       </div>
 
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -135,24 +113,43 @@ export const TemplateLibrary: React.FC = () => {
         </div>
       </div>
 
-      <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-        {filteredTemplates.map((template) => (
-          <TemplateCard
-            key={template.id}
-            template={template}
-            onSelect={(template) => console.log('Template selected:', template)}
-            onPreview={(template) => console.log('Template preview:', template)}
-          />
-        ))}
-      </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      )}
 
-      {filteredTemplates.length === 0 && (
+      {/* Empty State */}
+      {!loading && filteredTemplates.length === 0 && (
         <div className="text-center py-12">
           <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
             <Search className="h-8 w-8 text-gray-400 mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun template trouvé</h3>
-          <p className="text-gray-600">Essayez de modifier vos critères de recherche</p>
+          <p className="text-gray-600 mb-4">
+            {searchTerm ? 'Essayez de modifier vos critères de recherche' : 'Commencez par créer votre premier template'}
+          </p>
+          <button 
+            onClick={handleCreateTemplate}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Créer un template
+          </button>
+        </div>
+      )}
+
+      {/* Templates Grid/List */}
+      {!loading && filteredTemplates.length > 0 && (
+        <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+          {filteredTemplates.map((template) => (
+            <TemplateCard
+              key={template.id}
+              template={template}
+              onSelect={handleSelectTemplate}
+              onPreview={handlePreviewTemplate}
+            />
+          ))}
         </div>
       )}
     </div>
