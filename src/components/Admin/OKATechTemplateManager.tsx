@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Template, 
-  Plus, 
-  Search, 
-  Edit, 
-  Trash2, 
-  Eye,
-  BarChart3,
-  FileText,
-  Copy,
-  Star
-} from 'lucide-react';
+import { BookTemplate as Template, Plus, Search, Edit, Trash2, Eye, BarChart3, FileText, Copy, Star } from 'lucide-react';
 import { OKATechTemplate } from '../../services/okaTechService';
 import { okaTechService } from '../../services/okaTechService';
 

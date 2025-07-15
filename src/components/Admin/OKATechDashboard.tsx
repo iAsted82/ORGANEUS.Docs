@@ -1,21 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  FileText, 
-  Zap, 
-  HardDrive, 
-  TrendingUp,
-  Settings,
-  Template,
-  BarChart3,
-  Brain,
-  Clock,
-  Target,
-  Activity,
-  Palette,
-  Bell,
-  Shield
-} from 'lucide-react';
+import { Users, FileText, Zap, HardDrive, TrendingUp, Settings, BookTemplate as Template, BarChart3, Brain, Clock, Target, Activity, Palette, Bell, Shield } from 'lucide-react';
 import { OKATechMetrics, AIConfiguration, BranchSettings } from '../../services/okaTechService';
 import { okaTechService } from '../../services/okaTechService';
 import { MetricCard } from './MetricCard';
