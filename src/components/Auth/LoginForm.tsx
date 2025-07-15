@@ -58,7 +58,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       ];
     } else if (selectedCompany === 'oka-tech') {
       return [
-        { email: 'admin@okatech.com', password: 'AdminOKA2024!', role: 'Administrateur' },
+        { email: 'admin@okatech.com', password: 'okatech123', role: 'Administrateur' },
         { email: 'collaborateur@okatech.com', password: 'CollabOKA2024!', role: 'Collaborateur' }
       ];
     }

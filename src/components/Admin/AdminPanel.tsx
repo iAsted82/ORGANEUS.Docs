@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { Company } from '../../types/auth';
 import { SuperAdminDashboard } from './SuperAdminDashboard';
+import { OKATechDashboard } from './OKATechDashboard';
 
 export const AdminPanel: React.FC = () => {
   const { user, companies, updateCompanyStatus, addCompany } = useAuth();
@@ -48,6 +49,12 @@ export const AdminPanel: React.FC = () => {
   ];
 
   if (user?.role !== 'super_admin') {
+    // Si l'utilisateur est admin d'OKA Tech, afficher le dashboard OKA Tech
+    if (user?.role === 'admin' && user?.company.id === 'oka-tech') {
+      return <OKATechDashboard />;
+    }
+    
+    // Sinon, afficher le message d'accès restreint
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
         <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -55,7 +62,7 @@ export const AdminPanel: React.FC = () => {
           Accès restreint
         </h3>
         <p className="text-gray-600">
-          Seuls les Super Administrateurs peuvent accéder à cette section.
+          Seuls les administrateurs peuvent accéder à cette section.
         </p>
       </div>
     );

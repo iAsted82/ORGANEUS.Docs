@@ -79,7 +79,7 @@ const testUsers: User[] = [
 const testPasswords: { [key: string]: string } = {
   'admin@organeus.com': '@sted1982*',
   '+33 6 61 00 26 16': '@sted1982*',
-  'admin@okatech.com': 'AdminOKA2024!',
+  'admin@okatech.com': 'okatech123',
   'collaborateur@okatech.com': 'CollabOKA2024!'
 };
 
