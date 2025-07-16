@@ -247,22 +247,42 @@ export const OKATechUserManagement: React.FC = () => {
             <form onSubmit={(e) => {
               e.preventDefault();
               // Logique d'ajout d'utilisateur
-              setShowAddUser(false);
+              const form = e.target as HTMLFormElement;
+              const formData = new FormData(form);
+              const newUserData = {
+                name: formData.get('fullName') as string,
+                email: formData.get('email') as string,
+                role: formData.get('role') as 'admin' | 'collaborator',
+                isActive: true
+              };
+              
+              // Add new user through the service
+              okaTechService.createOKATechUser(newUserData)
+                .then(newUser => {
+                  setUsers(prev => [...prev, newUser]);
+                  setShowAddUser(false);
+                })
+                .catch(error => {
+                  console.error('Erreur lors de la création de l\'utilisateur:', error);
+                  alert('Erreur lors de la création de l\'utilisateur');
+                });
             }}>
               <div className="space-y-4">
                 <input
+                  name="fullName"
                   type="text"
                   placeholder="Nom complet"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
                 <input
+                  name="email"
                   type="email"
                   placeholder="Email"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select name="role" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                   <option value="collaborator">Collaborateur</option>
                   <option value="admin">Administrateur</option>
                 </select>

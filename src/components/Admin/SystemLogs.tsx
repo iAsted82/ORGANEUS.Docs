@@ -44,7 +44,14 @@ export const SystemLogs: React.FC = () => {
   const loadLogs = async () => {
     try {
       setLoading(true);
-      const systemLogs = await adminService.getSystemLogs(200);
+      // Add a new log entry for admin login
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser && JSON.parse(currentUser).email === 'admin@okatech.com') {
+        await adminService.addAdminLog('info', 'Admin Login', 'Administrator logged in successfully');
+      }
+      
+      // Get all logs
+      const systemLogs = await adminService.getSystemLogs(200); 
       setLogs(systemLogs);
     } catch (error) {
       console.error('Erreur lors du chargement des logs:', error);
