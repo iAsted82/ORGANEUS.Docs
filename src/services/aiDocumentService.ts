@@ -1,298 +1,270 @@
-import { KnowledgeDocument, Analysis, GeneratedContent, StructuredData } from '../types/knowledge';
-import { CompanyInfo } from '../types/company';
-import { DocumentType } from '../types';
+import { KnowledgeDocument } from '../types/knowledge';
+import { CompanyProfile } from '../types/company';
 
-export interface AIPanel {
-  generateFromKnowledge(prompt: string, selectedDocs: string[]): Promise<string>;
-  improveText(text: string, style: string): Promise<string>;
-  getSuggestions(context: string): Promise<string[]>;
-  extractKeyInfo(documentIds: string[]): Promise<any>;
+interface AIGenerationOptions {
+  documentType: string;
+  tone: 'formal' | 'casual' | 'professional';
+  length: 'short' | 'medium' | 'long';
+  language: string;
+  sourceDocuments?: KnowledgeDocument[];
+  companyProfile?: CompanyProfile;
+  customPrompt?: string;
 }
 
-class AIDocumentService implements AIPanel {
-  private apiKey: string | null = null;
+interface AIResponse {
+  content: string;
+  suggestions?: string[];
+  metadata?: {
+    model: string;
+    tokensUsed: number;
+    generationTime: number;
+  };
+}
 
-  constructor() {
-    // Récupérer la clé API depuis le service des clés
-    this.initializeApiKey();
-  }
+class AIDocumentService {
+  private apiKeys = {
+    openai: localStorage.getItem('openai_api_key') || '',
+    anthropic: localStorage.getItem('anthropic_api_key') || '',
+    gemini: localStorage.getItem('gemini_api_key') || '',
+  };
 
-  private async initializeApiKey() {
-    try {
-      // Simulation de récupération de clé API
-      this.apiKey = 'mock-api-key';
-    } catch (error) {
-      console.error('Erreur lors de l\'initialisation de la clé API:', error);
-    }
-  }
+  // Générer un document avec l'IA
+  async generateDocument(options: AIGenerationOptions): Promise<AIResponse> {
+    // Simulation de génération IA
+    await this.simulateDelay(2000);
 
-  async analyzeKnowledgeBase(documentIds: string[]): Promise<Analysis> {
-    // Simulation d'analyse
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const context = this.buildContext(options);
+    const generatedContent = this.simulateAIGeneration(context, options);
 
     return {
-      totalDocuments: documentIds.length,
-      totalWords: documentIds.length * 500,
-      commonThemes: ['développement', 'technologie', 'innovation', 'qualité'],
-      keyEntities: ['ORGANEUS', 'OKA Tech', 'clients', 'projets'],
-      documentTypes: { pdf: 3, image: 1, text: 1 },
-      categories: { Juridique: 1, Commercial: 1, Technique: 1, Branding: 1, Processus: 1 }
+      content: generatedContent,
+      suggestions: this.generateSuggestions(options.documentType),
+      metadata: {
+        model: 'claude-3-opus',
+        tokensUsed: Math.floor(Math.random() * 1000) + 500,
+        generationTime: 2000,
+      },
     };
   }
 
-  async generateFromKnowledge(prompt: string, selectedDocs: string[]): Promise<string> {
-    // Simulation de génération de contenu basée sur la base de connaissance
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  // Améliorer un texte existant
+  async improveText(text: string, improvementType: 'clarity' | 'tone' | 'grammar' | 'conciseness'): Promise<AIResponse> {
+    await this.simulateDelay(1000);
 
-    const mockResponses = [
-      `Basé sur votre base de connaissance, voici une réponse générée pour "${prompt}":
-
-Notre expertise en développement logiciel, documentée dans nos contrats et propositions commerciales, nous permet de proposer des solutions innovantes. Avec notre équipe expérimentée et notre processus agile, nous garantissons des livrables de qualité dans les délais convenus.
-
-Points clés extraits de vos documents:
-- Tarification compétitive à 500€/jour
-- Méthodologie agile avec sprints de 2 semaines
-- Technologies modernes (React, TypeScript, Node.js)
-- Couverture de tests minimum 80%
-
-Cette approche nous permet de répondre efficacement à vos besoins spécifiques.`,
-
-      `En me basant sur les documents sélectionnés, je peux vous proposer le contenu suivant pour "${prompt}":
-
-Votre société ORGANEUS, forte de son expertise technique et de sa méthodologie éprouvée, est en mesure de délivrer des solutions de haute qualité. Les processus décrits dans votre documentation technique montrent une approche structurée et professionnelle.
-
-Éléments pertinents de votre base de connaissance:
-- Spécifications techniques détaillées
-- Processus de développement agile
-- Standards de qualité élevés
-- Engagement client fort
-
-Cette expertise constitue un atout majeur pour vos projets futurs.`
-    ];
-
-    return mockResponses[Math.floor(Math.random() * mockResponses.length)];
-  }
-
-  async improveText(text: string, style: string): Promise<string> {
-    // Simulation d'amélioration de texte
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const improvements = {
-      formal: `Version formelle améliorée :
-
-${text}
-
-Cette version a été optimisée pour :
-- Utiliser un langage plus soutenu
-- Améliorer la structure des phrases
-- Renforcer la crédibilité professionnelle`,
-
-      casual: `Version décontractée améliorée :
-
-${text}
-
-Cette version a été adaptée pour :
-- Utiliser un ton plus accessible
-- Simplifier le vocabulaire
-- Créer une proximité avec le lecteur`,
-
-      technical: `Version technique améliorée :
-
-${text}
-
-Cette version a été enrichie pour :
-- Inclure plus de détails techniques
-- Utiliser la terminologie appropriée
-- Structurer l'information de manière claire`
-    };
-
-    return improvements[style as keyof typeof improvements] || text;
-  }
-
-  async getSuggestions(context: string): Promise<string[]> {
-    // Simulation de suggestions contextuelles
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const suggestions = [
-      'Ajouter des exemples concrets pour illustrer vos propos',
-      'Inclure des chiffres et statistiques pour renforcer l\'argumentation',
-      'Structurer le contenu avec des sous-titres clairs',
-      'Ajouter un appel à l\'action en fin de document',
-      'Inclure les coordonnées de contact de l\'entreprise',
-      'Mentionner les références et réalisations antérieures',
-      'Ajouter des témoignages clients si pertinent',
-      'Préciser les délais et modalités de livraison'
-    ];
-
-    return suggestions.slice(0, 4);
-  }
-
-  async extractKeyInfo(documentIds: string[]): Promise<any> {
-    // Simulation d'extraction d'informations clés
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    const improvedText = this.simulateTextImprovement(text, improvementType);
 
     return {
+      content: improvedText,
+      suggestions: [`Le texte a été amélioré pour ${improvementType}`],
+      metadata: {
+        model: 'gpt-4',
+        tokensUsed: text.length,
+        generationTime: 1000,
+      },
+    };
+  }
+
+  // Analyser des documents sources
+  async analyzeDocuments(documents: KnowledgeDocument[]): Promise<{
+    summary: string;
+    keyPoints: string[];
+    recommendations: string[];
+  }> {
+    await this.simulateDelay(1500);
+
+    return {
+      summary: `Analyse de ${documents.length} documents. Les documents couvrent principalement ${this.extractTopics(documents).join(', ')}.`,
       keyPoints: [
-        'Expertise technique confirmée en développement web',
-        'Processus agile avec sprints de 2 semaines',
-        'Tarification compétitive à 500€/jour',
-        'Couverture de tests minimum 80%'
+        'Point clé extrait des documents sources',
+        'Information importante identifiée',
+        'Tendance principale observée',
       ],
-      entities: ['ORGANEUS', 'OKA Tech', 'développement', 'agile'],
-      summary: 'Documents relatifs à l\'expertise technique et commerciale de l\'entreprise',
       recommendations: [
-        'Mettre en avant l\'expérience technique',
-        'Souligner la méthodologie agile',
-        'Présenter les références clients'
-      ]
+        'Utiliser ces informations pour structurer le nouveau document',
+        'Intégrer les données clés dans l\'introduction',
+        'Référencer les sources appropriées',
+      ],
     };
   }
 
-  async generateContent(
-    prompt: string,
-    context: KnowledgeDocument[],
-    companyInfo: CompanyInfo
-  ): Promise<GeneratedContent> {
-    // Simulation de génération de contenu avancée
-    await new Promise(resolve => setTimeout(resolve, 3000));
+  // Extraire des informations spécifiques
+  async extractInformation(documents: KnowledgeDocument[], infoType: string): Promise<string[]> {
+    await this.simulateDelay(800);
 
-    const content = `Document généré pour : ${prompt}
+    // Simulation d'extraction
+    return [
+      `Information de type ${infoType} extraite`,
+      'Donnée pertinente identifiée',
+      'Élément clé trouvé dans les documents',
+    ];
+  }
 
-Bonjour,
+  // Construire le contexte pour l'IA
+  private buildContext(options: AIGenerationOptions): string {
+    let context = `Type de document: ${options.documentType}\n`;
+    context += `Ton: ${options.tone}\n`;
+    context += `Longueur: ${options.length}\n`;
 
-Suite à votre demande, nous avons le plaisir de vous proposer nos services. ${companyInfo.name}, forte de son expertise documentée dans notre base de connaissance, peut vous accompagner dans vos projets.
+    if (options.companyProfile) {
+      context += `\nEntreprise: ${options.companyProfile.general.name}\n`;
+      if (options.companyProfile.general.description) {
+        context += `Description: ${options.companyProfile.general.description}\n`;
+      }
+    }
 
-Nos atouts :
-- Expertise technique reconnue
-- Méthodologie éprouvée
-- Équipe expérimentée
-- Processus qualité rigoureux
+    if (options.sourceDocuments && options.sourceDocuments.length > 0) {
+      context += `\nDocuments sources:\n`;
+      options.sourceDocuments.forEach(doc => {
+        context += `- ${doc.title}: ${doc.extractedText?.substring(0, 200)}...\n`;
+      });
+    }
+
+    if (options.customPrompt) {
+      context += `\nInstructions spécifiques: ${options.customPrompt}\n`;
+    }
+
+    return context;
+  }
+
+  // Simulation de génération IA
+  private simulateAIGeneration(context: string, options: AIGenerationOptions): string {
+    const templates = {
+      contract: `CONTRAT DE ${options.tone === 'formal' ? 'PRESTATION DE SERVICES' : 'COLLABORATION'}
+
+Entre les soussignés :
+
+${options.companyProfile ? options.companyProfile.general.name : '[Nom de l\'entreprise]'}
+${options.companyProfile?.contact.address || '[Adresse]'}
+Représentée par [Nom du représentant]
+Ci-après dénommée "Le Prestataire"
+
+Et
+
+[Nom du client]
+[Adresse du client]
+Ci-après dénommé "Le Client"
+
+Il a été convenu et arrêté ce qui suit :
+
+ARTICLE 1 - OBJET
+Le présent contrat a pour objet de définir les conditions dans lesquelles le Prestataire réalisera pour le Client les prestations suivantes : [Description des prestations].
+
+ARTICLE 2 - DURÉE
+Le présent contrat est conclu pour une durée de [X] mois à compter du [Date].
+
+ARTICLE 3 - PRIX ET MODALITÉS DE PAIEMENT
+En contrepartie des prestations, le Client versera au Prestataire la somme de [Montant] euros HT.`,
+
+      report: `RAPPORT ${options.tone === 'formal' ? 'D\'ACTIVITÉ' : 'DE PROJET'}
+
+${options.companyProfile ? options.companyProfile.general.name : '[Nom de l\'entreprise]'}
+Date : ${new Date().toLocaleDateString('fr-FR')}
+
+RÉSUMÉ EXÉCUTIF
+Ce rapport présente une vue d'ensemble des activités réalisées durant la période concernée.
+
+1. INTRODUCTION
+${options.sourceDocuments && options.sourceDocuments.length > 0 ? 
+  'Sur la base des documents analysés, nous avons identifié plusieurs points clés qui méritent attention.' :
+  'Ce document synthétise les principales réalisations et recommandations.'}
+
+2. ANALYSE
+Les données collectées montrent une progression significative dans les domaines suivants :
+- Performance opérationnelle
+- Satisfaction client
+- Innovation produit
+
+3. RECOMMANDATIONS
+Nous recommandons les actions suivantes pour optimiser les résultats :
+- Mise en place d'indicateurs de suivi
+- Formation continue des équipes
+- Investissement dans les outils digitaux`,
+
+      letter: `${options.companyProfile ? options.companyProfile.general.name : '[Nom de l\'entreprise]'}
+${options.companyProfile?.contact.address || '[Adresse]'}
+${options.companyProfile?.contact.phone || '[Téléphone]'}
+
+Le ${new Date().toLocaleDateString('fr-FR')}
+
+Objet : [Objet de la lettre]
+
+${options.tone === 'formal' ? 'Madame, Monsieur,' : 'Bonjour,'}
+
+${options.sourceDocuments && options.sourceDocuments.length > 0 ?
+  'Suite à notre analyse des documents fournis, nous souhaitons porter à votre attention les éléments suivants.' :
+  'Nous avons le plaisir de vous adresser ce courrier concernant [sujet].'}
+
+[Corps de la lettre avec les informations pertinentes extraites des documents sources si disponibles]
 
 Nous restons à votre disposition pour tout complément d'information.
 
-Cordialement,
-${companyInfo.signature?.defaultSignatory}
-${companyInfo.signature?.title}
-${companyInfo.name}`;
+${options.tone === 'formal' ? 'Nous vous prions d\'agréer, Madame, Monsieur, l\'expression de nos salutations distinguées.' : 'Cordialement,'}
 
-    return {
-      content,
-      sources: context.map(doc => doc.name),
-      confidence: 0.85,
-      suggestedTitle: `Document généré - ${prompt}`,
-      metadata: {
-        wordCount: content.split(' ').length,
-        readingTime: Math.ceil(content.split(' ').length / 200),
-        complexity: 'medium'
-      }
+[Signature]
+${options.companyProfile?.branding.emailSignature || '[Nom et fonction]'}`,
     };
+
+    return templates[options.documentType as keyof typeof templates] || 
+      `Document ${options.documentType} généré avec le contexte suivant :\n\n${context}\n\n[Contenu généré]`;
   }
 
-  async createDocument(
-    type: DocumentType,
-    knowledge: KnowledgeDocument[],
-    requirements: string
-  ): Promise<any> {
-    // Simulation de création de document complet
-    await new Promise(resolve => setTimeout(resolve, 2500));
-
-    const templates = {
-      letter: `Objet : ${requirements}
-
-Madame, Monsieur,
-
-Nous avons l'honneur de vous adresser cette lettre concernant ${requirements}.
-
-En nous appuyant sur notre expertise documentée, nous souhaitons vous proposer nos services.
-
-Nous restons à votre entière disposition.
-
-Cordialement,`,
-
-      contract: `CONTRAT DE PRESTATION
-
-Article 1 - Objet
-Le présent contrat a pour objet ${requirements}.
-
-Article 2 - Prestations
-Basé sur notre expertise technique et notre méthodologie éprouvée, nous nous engageons à :
-- Respecter les délais convenus
-- Livrer un travail de qualité
-- Assurer le suivi du projet
-
-Article 3 - Conditions financières
-Les conditions sont établies selon notre grille tarifaire standard.`,
-
-      invoice: `FACTURE
-
-Référence : ${requirements}
-
-Prestations fournies :
-- Développement selon cahier des charges
-- Tests et validation
-- Livraison et mise en production
-
-Montant HT : À définir selon devis
-TVA : 20%
-Montant TTC : À définir`
+  // Simulation d'amélioration de texte
+  private simulateTextImprovement(text: string, type: string): string {
+    const improvements = {
+      clarity: text.replace(/\b(\w+)\s+\1\b/gi, '$1'), // Supprime les répétitions
+      tone: text.replace(/!/g, '.'), // Rend plus formel
+      grammar: text.charAt(0).toUpperCase() + text.slice(1), // Capitalise
+      conciseness: text.split(' ').slice(0, Math.floor(text.split(' ').length * 0.8)).join(' '), // Réduit de 20%
     };
 
-    return {
-      type,
-      content: templates[type] || templates.letter,
-      sources: knowledge.map(doc => doc.name),
-      createdAt: new Date().toISOString()
-    };
+    return improvements[type as keyof typeof improvements] || text;
   }
 
-  async extractStructuredData(documents: KnowledgeDocument[]): Promise<StructuredData> {
-    // Simulation d'extraction de données structurées
-    await new Promise(resolve => setTimeout(resolve, 1800));
-
-    return {
-      summary: 'Analyse des documents de la base de connaissance montrant une expertise technique solide et une approche méthodique.',
-      keyPoints: [
-        'Processus de développement agile établi',
-        'Tarification compétitive et transparente',
-        'Expertise technique confirmée',
-        'Méthodologie qualité rigoureuse'
+  // Générer des suggestions
+  private generateSuggestions(documentType: string): string[] {
+    const suggestions = {
+      contract: [
+        'Ajouter une clause de confidentialité',
+        'Préciser les modalités de résiliation',
+        'Inclure les conditions de propriété intellectuelle',
       ],
-      entities: ['ORGANEUS', 'OKA Tech', 'développement', 'agile', 'qualité'],
-      categories: [...new Set(documents.map(doc => doc.category))],
-      timeline: [
-        {
-          date: new Date(Date.now() - 86400000 * 30).toISOString(),
-          event: 'Création du processus de développement',
-          source: 'Processus de développement.txt'
-        },
-        {
-          date: new Date(Date.now() - 86400000 * 15).toISOString(),
-          event: 'Établissement du contrat type',
-          source: 'Contrat de prestation OKA Tech.pdf'
-        },
-        {
-          date: new Date(Date.now() - 86400000 * 5).toISOString(),
-          event: 'Proposition commerciale ORGANEUS',
-          source: 'Proposition commerciale ORGANEUS.pdf'
-        }
-      ]
+      report: [
+        'Ajouter des graphiques pour illustrer les données',
+        'Inclure un sommaire exécutif en début de document',
+        'Détailler les méthodologies utilisées',
+      ],
+      letter: [
+        'Vérifier le ton adapté au destinataire',
+        'Ajouter les références de dossiers précédents',
+        'Inclure les coordonnées complètes',
+      ],
     };
+
+    return suggestions[documentType as keyof typeof suggestions] || [
+      'Réviser la structure du document',
+      'Ajouter des sections supplémentaires si nécessaire',
+      'Vérifier la cohérence du contenu',
+    ];
   }
 
-  async generateSummary(documents: KnowledgeDocument[]): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  // Extraire les sujets principaux
+  private extractTopics(documents: KnowledgeDocument[]): string[] {
+    const categories = [...new Set(documents.map(doc => doc.metadata.category))];
+    return categories.length > 0 ? categories : ['sujets variés'];
+  }
 
-    return `Résumé de votre base de connaissance (${documents.length} documents) :
+  // Simuler un délai réseau
+  private simulateDelay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
-Votre entreprise dispose d'une documentation complète couvrant les aspects techniques, commerciaux et organisationnels. Les documents analysés révèlent une approche professionnelle structurée avec des processus bien définis.
-
-Points forts identifiés :
-- Méthodologie de développement agile
-- Tarification transparente et compétitive
-- Standards de qualité élevés
-- Documentation technique complète
-
-Cette base de connaissance constitue un excellent fondement pour générer des documents cohérents et professionnels.`;
+  // Vérifier la disponibilité des APIs
+  checkAPIAvailability(): { openai: boolean; anthropic: boolean; gemini: boolean } {
+    return {
+      openai: !!this.apiKeys.openai,
+      anthropic: !!this.apiKeys.anthropic,
+      gemini: !!this.apiKeys.gemini,
+    };
   }
 }
 
