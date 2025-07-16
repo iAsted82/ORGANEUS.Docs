@@ -32,7 +32,8 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
   ];
 
   const handleFileUpload = (files: File[]) => {
-    setUploadedFiles(prev => [...prev, ...files]);
+    // Mise à jour pour utiliser la nouvelle interface FileUploadZone
+    setUploadedFiles(files);
     
     // Initialiser les métadonnées pour chaque fichier
     const newMetadata = { ...metadata };
@@ -206,10 +207,11 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           <div className="space-y-6">
             {/* Zone d'upload */}
             <FileUploadZone
-              onFileUpload={handleFileUpload}
-              acceptedTypes={['application/pdf', 'image/*', 'text/plain']}
+              onFilesSelected={handleFileUpload}
+              acceptedFormats=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx"
+              maxFiles={10}
               maxSize={50}
-              multiple={true}
+              className=""
             />
 
             {/* Fichiers uploadés avec métadonnées */}

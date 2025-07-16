@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { KnowledgeDocument } from '../../types/knowledge';
 import { CompanyInfo } from '../../types/company';
-import { CompanyInfoWidget } from './CompanyInfoWidget';
+import { CompanyInfoWidget } from '../Company/CompanyInfoWidget';
 import { AIAssistantPanel } from './AIAssistantPanel';
 import { aiDocumentService } from '../../services/aiDocumentService';
 
@@ -122,15 +122,8 @@ export const AdvancedDocumentEditor: React.FC<AdvancedDocumentEditorProps> = ({
   const insertCompanyBlock = (blockId: string) => {
     if (!companyInfo) return;
     
-    // Récupérer le template
-    const templates = companyService.getCompanyTemplates();
-    const template = templates.find(t => t.id === blockId);
-    
-    if (template) {
-      // Remplacer les variables et insérer le contenu
-      const processedContent = companyService.replaceVariables(template.template);
-      setContent(prev => `${prev}\n\n${processedContent}`);
-    }
+    // Mise à jour pour utiliser la nouvelle interface CompanyInfoWidget
+    setContent(prev => `${prev}\n\n${blockId}`);
   };
 
   const handleImproveText = async (style: string) => {
@@ -284,7 +277,7 @@ export const AdvancedDocumentEditor: React.FC<AdvancedDocumentEditorProps> = ({
               {activeLeftTab === 'company' && companyInfo && (
                 <CompanyInfoWidget 
                   companyInfo={companyInfo}
-                  onInsertBlock={insertCompanyBlock}
+                  onInsert={insertCompanyBlock}
                 />
               )}
             </div>
