@@ -1,159 +1,176 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  FileText, 
-  Plus, 
-  TrendingUp, 
-  Users, 
-  Clock, 
-  Star,
-  Archive,
-  BarChart3,
-  Activity,
-  Zap
+import React from 'react';
+import {
+  FileText,
+  TrendingUp,
+  Users,
+  Clock,
+  Brain,
+  Database,
+  Plus,
+  FolderOpen
 } from 'lucide-react';
-import { DocumentStats } from '../../services/documentService';
-import { documentService } from '../../services/documentService';
-import { StatsCard } from './StatsCard';
-import { RecentDocuments } from './RecentDocuments';
-import { QuickActions } from './QuickActions';
-import { ActivityFeed } from './ActivityFeed';
+import { useAuth } from '../../contexts/AuthContext';
+import { knowledgeBaseService } from '../../services/knowledgeBaseService';
 
 export const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<DocumentStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const knowledgeDocsCount = knowledgeBaseService.getAllDocuments().length;
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      const documentStats = await documentService.getDocumentStats();
-      setStats(documentStats);
-    } catch (error) {
-      console.error('Erreur lors du chargement du dashboard:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateDocument = () => {
-    // Cette fonction sera appelée depuis le parent
-    console.log('Création d\'un nouveau document');
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!stats) {
-    return (
-      <div className="text-center py-12">
-        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Erreur de chargement</h3>
-        <p className="text-gray-600">Impossible de charger les données du dashboard</p>
-        <button 
-          onClick={loadDashboardData}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Réessayer
-        </button>
-      </div>
-    );
-  }
-
-  const dashboardStats = [
+  const stats = [
     {
-      title: 'Total Documents',
-      value: stats.totalDocuments.toString(),
-      change: `+${stats.documentsThisMonth} ce mois`,
-      trend: 'up' as const,
+      label: 'Documents créés',
+      value: '156',
+      change: '+12%',
       icon: FileText,
-      color: 'bg-blue-500'
+      color: 'blue'
     },
     {
-      title: 'Favoris',
-      value: stats.favoriteCount.toString(),
-      change: 'Documents marqués',
-      trend: 'neutral' as const,
-      icon: Star,
-      color: 'bg-yellow-500'
+      label: 'Base de connaissance',
+      value: knowledgeDocsCount.toString(),
+      change: 'documents',
+      icon: Database,
+      color: 'green'
     },
     {
-      title: 'Cette semaine',
-      value: stats.documentsThisWeek.toString(),
-      change: `+${stats.documentsToday} aujourd'hui`,
-      trend: 'up' as const,
-      icon: TrendingUp,
-      color: 'bg-green-500'
+      label: 'Générations IA',
+      value: '47',
+      change: 'ce mois',
+      icon: Brain,
+      color: 'purple'
     },
     {
-      title: 'Archivés',
-      value: stats.archivedCount.toString(),
-      change: 'Documents archivés',
-      trend: 'neutral' as const,
-      icon: Archive,
-      color: 'bg-gray-500'
+      label: 'Temps économisé',
+      value: '24h',
+      change: 'cette semaine',
+      icon: Clock,
+      color: 'orange'
+    }
+  ];
+
+  const quickActions = [
+    {
+      title: 'Créer un document',
+      description: 'Commencez un nouveau document',
+      icon: Plus,
+      color: 'blue',
+      action: 'create'
+    },
+    {
+      title: 'Base de connaissance',
+      description: 'Gérez vos documents de référence',
+      icon: Database,
+      color: 'green',
+      action: 'knowledge'
+    },
+    {
+      title: 'Templates',
+      description: 'Parcourez les modèles',
+      icon: FileText,
+      color: 'purple',
+      action: 'templates'
+    },
+    {
+      title: 'Documents récents',
+      description: 'Accédez à vos derniers travaux',
+      icon: Clock,
+      color: 'orange',
+      action: 'recent'
     }
   ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Tableau de bord</h2>
-        <p className="text-gray-600">Bienvenue dans votre espace de travail ORGANEUS Docs</p>
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold mb-2">
+          Bonjour {user?.name} 👋
+        </h1>
+        <p className="text-blue-100">
+          Bienvenue sur ORGANEUS Docs. Que souhaitez-vous créer aujourd'hui ?
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {dashboardStats.map((stat, index) => (
-          <StatsCard key={index} {...stat} />
-        ))}
-      </div>
-
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Documents */}
-        <div className="lg:col-span-2">
-          <RecentDocuments />
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <QuickActions onCreateDocument={handleCreateDocument} />
-
-          {/* Activity Feed */}
-          <ActivityFeed activities={stats.recentActivity} />
-
-          {/* Status Overview */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">État des documents</h3>
-            <div className="space-y-3">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          const colorClasses = {
+            blue: 'bg-blue-100 text-blue-600',
+            green: 'bg-green-100 text-green-600',
+            purple: 'bg-purple-100 text-purple-600',
+            orange: 'bg-orange-100 text-orange-600'
+          };
+          
+          return (
+            <div key={index} className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Brouillons</span>
-                <span className="text-sm font-medium text-yellow-600">{stats.draftCount}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Finalisés</span>
-                <span className="text-sm font-medium text-green-600">{stats.finalCount}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Envoyés</span>
-                <span className="text-sm font-medium text-blue-600">{stats.sentCount}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Archivés</span>
-                <span className="text-sm font-medium text-gray-600">{stats.archivedCount}</span>
+                <div>
+                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                  <p className={`text-sm mt-1 ${
+                    stat.change.includes('+') ? 'text-green-600' : 'text-gray-500'
+                  }`}>
+                    {stat.change}
+                  </p>
+                </div>
+                <div className={`p-3 rounded-lg ${colorClasses[stat.color]}`}>
+                  <Icon className="h-6 w-6" />
+                </div>
               </div>
             </div>
-          </div>
+          );
+        })}
+      </div>
+
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map((action, index) => {
+            const Icon = action.icon;
+            const colorClasses = {
+              blue: 'from-blue-500 to-blue-600',
+              green: 'from-green-500 to-green-600',
+              purple: 'from-purple-500 to-pink-500',
+              orange: 'from-orange-500 to-orange-600'
+            };
+            
+            return (
+              <button
+                key={index}
+                className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-left group"
+              >
+                <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${colorClasses[action.color]} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <Icon className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
+                <p className="text-sm text-gray-600">{action.description}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Activité récente</h2>
+        <div className="space-y-4">
+          {[
+            { action: 'Document créé', item: 'Contrat de service 2024', time: 'Il y a 2 heures' },
+            { action: 'Fichier uploadé', item: 'Rapport annuel.pdf', time: 'Il y a 5 heures' },
+            { action: 'IA utilisée', item: 'Génération lettre commerciale', time: 'Hier' }
+          ].map((activity, index) => (
+            <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                  <p className="text-sm text-gray-500">{activity.item}</p>
+                </div>
+              </div>
+              <span className="text-sm text-gray-500">{activity.time}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

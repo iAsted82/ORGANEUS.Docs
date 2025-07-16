@@ -9,7 +9,9 @@ import { DocumentList } from './components/Documents/DocumentList';
 import { FavoriteDocuments } from './components/Documents/FavoriteDocuments';
 import { ArchivedDocuments } from './components/Documents/ArchivedDocuments';
 import { RecentDocuments } from './components/Documents/RecentDocuments';
-import { DocumentEditor } from './components/Editor/DocumentEditor';
+import { CreateDocument } from './components/Documents/CreateDocument';
+import { KnowledgeBaseManager } from './components/KnowledgeBase/KnowledgeBaseManager';
+import { CompanyProfile } from './components/Company/CompanyProfile';
 import { AdminPanel } from './components/Admin/AdminPanel';
 
 const AppContent: React.FC = () => {
@@ -36,7 +38,11 @@ const AppContent: React.FC = () => {
       case 'archived':
         return <ArchivedDocuments />;
       case 'create':
-        return <DocumentEditor />;
+        return <CreateDocument />;
+      case 'knowledge':
+        return <KnowledgeBaseManager />;
+      case 'company':
+        return <CompanyProfile />;
       case 'admin':
         return <AdminPanel />;
       default:
