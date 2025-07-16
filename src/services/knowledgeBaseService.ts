@@ -291,5 +291,7 @@ class KnowledgeBaseService {
 
   getCategories(): string[] {
     return [...new Set(this.documents.map(doc => doc.category))];
+  }
+}
 
 export const knowledgeBaseService = new KnowledgeBaseService();
