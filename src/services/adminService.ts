@@ -118,6 +118,28 @@ class AdminService {
       `User ${user.name} ${user.isActive ? 'activated' : 'deactivated'}`, userId);
     return user;
   }
+  
+  // Add a log entry for administrative actions
+  async addAdminLog(
+    level: 'info' | 'warning' | 'error' | 'critical',
+    action: string,
+    details: string,
+    userId?: string
+  ): Promise<SystemLog> {
+    const log: SystemLog = {
+      id: `log-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      level,
+      action,
+      userId: userId || 'admin-oka',
+      userName: userId ? 'Administrateur' : 'Administrateur OKA Tech',
+      details,
+      ipAddress: '192.168.1.100'
+    };
+    
+    this.logs.unshift(log);
+    return log;
+  }
 
   // Logs and Activities
   async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {

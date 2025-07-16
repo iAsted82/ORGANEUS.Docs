@@ -111,6 +111,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             ...foundUser,
             lastLogin: new Date().toISOString()
           });
+          // Store current user information for logging purposes
+          localStorage.setItem('currentUser', JSON.stringify({
+            id: foundUser.id,
+            email: foundUser.email,
+            role: foundUser.role,
+            company: foundUser.company.id
+          }));
           setIsAuthenticated(true);
           return true;
         }
@@ -128,6 +135,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
+    localStorage.removeItem('currentUser');
   };
 
   const updateCompanyStatus = (companyId: string, isActive: boolean) => {
