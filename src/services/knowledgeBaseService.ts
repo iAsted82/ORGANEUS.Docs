@@ -33,11 +33,13 @@ class KnowledgeBaseService {
           tags: ['contrat', 'prestation', 'développement'],
           category: 'Juridique',
           uploadedAt: new Date().toISOString(),
+          uploadedBy: 'admin@organeus.com',
           size: 245760,
           extractedData: {
             title: 'Contrat de prestation OKA Tech',
             summary: 'Conditions générales de prestation pour services de développement',
-            keyPoints: ['Tarif: 500€/jour', 'Minimum 5 jours', 'Délais: 2-4 semaines']
+            keyPoints: ['Tarif: 500€/jour', 'Minimum 5 jours', 'Délais: 2-4 semaines'],
+            entities: ['OKA Tech', '500€', '5 jours', '2-4 semaines']
           }
         },
         {
@@ -49,11 +51,13 @@ class KnowledgeBaseService {
           tags: ['proposition', 'commercial', 'IA', 'documents'],
           category: 'Commercial',
           uploadedAt: new Date(Date.now() - 86400000).toISOString(),
+          uploadedBy: 'admin@organeus.com',
           size: 189440,
           extractedData: {
             title: 'Proposition commerciale ORGANEUS',
             summary: 'Développement plateforme de génération de documents IA',
-            keyPoints: ['Budget: 45 000€ HT', 'Durée: 3 mois', 'APIs IA intégrées']
+            keyPoints: ['Budget: 45 000€ HT', 'Durée: 3 mois', 'APIs IA intégrées'],
+            entities: ['ORGANEUS', '45 000€ HT', '3 mois', 'OpenAI', 'Anthropic']
           }
         },
         {
@@ -65,11 +69,13 @@ class KnowledgeBaseService {
           tags: ['technique', 'spécifications', 'développement'],
           category: 'Technique',
           uploadedAt: new Date(Date.now() - 172800000).toISOString(),
+          uploadedBy: 'admin@organeus.com',
           size: 156672,
           extractedData: {
             title: 'Cahier des charges technique',
             summary: 'Spécifications techniques pour application de gestion documentaire',
-            keyPoints: ['React 18 + TypeScript', 'Architecture microservices', 'Hébergement AWS']
+            keyPoints: ['React 18 + TypeScript', 'Architecture microservices', 'Hébergement AWS'],
+            entities: ['React 18', 'TypeScript', 'Tailwind CSS', 'Node.js', 'PostgreSQL', 'AWS']
           }
         },
         {
@@ -81,11 +87,13 @@ class KnowledgeBaseService {
           tags: ['logo', 'branding', 'identité'],
           category: 'Branding',
           uploadedAt: new Date(Date.now() - 259200000).toISOString(),
+          uploadedBy: 'admin@organeus.com',
           size: 45120,
           extractedData: {
             title: 'Logo ORGANEUS',
             summary: 'Logo officiel de l\'entreprise',
-            keyPoints: ['512x512px', 'Fond transparent', 'Couleurs: bleu et violet']
+            keyPoints: ['512x512px', 'Fond transparent', 'Couleurs: bleu et violet'],
+            entities: ['ORGANEUS', '#2563eb', '#7c3aed', '512x512px']
           }
         },
         {
@@ -97,11 +105,13 @@ class KnowledgeBaseService {
           tags: ['processus', 'agile', 'développement'],
           category: 'Processus',
           uploadedAt: new Date(Date.now() - 345600000).toISOString(),
+          uploadedBy: 'admin@organeus.com',
           size: 2048,
           extractedData: {
             title: 'Processus de développement',
             summary: 'Méthodologie agile avec sprints de 2 semaines',
-            keyPoints: ['Sprints 2 semaines', 'Daily standups', 'Couverture code 80%', 'CI/CD']
+            keyPoints: ['Sprints 2 semaines', 'Daily standups', 'Couverture code 80%', 'CI/CD'],
+            entities: ['Méthodologie agile', 'sprints', 'daily standups', '80%', 'CI/CD']
           }
         }
       ];
@@ -120,6 +130,7 @@ class KnowledgeBaseService {
       tags: [],
       category: 'Non classé',
       uploadedAt: new Date().toISOString(),
+      uploadedBy: 'admin@organeus.com',
       size: file.size
     };
 
@@ -205,6 +216,10 @@ class KnowledgeBaseService {
     return this.documents;
   }
 
+  getAllDocumentsSync(): KnowledgeDocument[] {
+    return this.documents;
+  }
+
   async getDocumentById(id: string): Promise<KnowledgeDocument | null> {
     return this.documents.find(doc => doc.id === id) || null;
   }
@@ -244,12 +259,18 @@ class KnowledgeBaseService {
     const commonThemes = [...new Set(allTags)].slice(0, 10);
 
     return {
-      totalDocuments: this.documents.length,
-      totalWords,
-      commonThemes,
-      keyEntities: ['ORGANEUS', 'OKA Tech', 'développement', 'IA', 'contrat'],
-      documentTypes,
-      categories
+      topics: commonThemes,
+      sentiment: 'positive',
+      keyInsights: [
+        'Forte présence de documentation technique',
+        'Nombreux documents contractuels',
+        'Besoin d\'améliorer la documentation marketing'
+      ],
+      recommendations: [
+        'Standardiser les formats de contrats',
+        'Développer plus de documents marketing',
+        'Mettre à jour la documentation technique'
+      ]
     };
   }
 
