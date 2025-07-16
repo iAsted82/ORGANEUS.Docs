@@ -291,11 +291,5 @@ class KnowledgeBaseService {
 
   getCategories(): string[] {
     return [...new Set(this.documents.map(doc => doc.category))];
-  }
-
-  getAllTags(): string[] {
-    return [...new Set(this.documents.flatMap(doc => doc.tags))];
-  }
-}
 
 export const knowledgeBaseService = new KnowledgeBaseService();
